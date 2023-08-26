@@ -1,3 +1,28 @@
+lib-cov
+*.seed
+*.csv
+*.dat
+*.out
+*.pid
+*.gz
+
+pid
+results
+tmp
+
+#Build
+public/css/main.css
+
+# Coverage reports
+coverage
+
+# API keys and secrets
+.env
+
+# Dependency directory
+node_modules
+bower_components
+
 # Logs
 logs
 *.log
@@ -7,10 +32,16 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
+dist/**/*
 dist-ssr
 *.local
+
+# yarn
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+.pnp.*
+yarn.lock
 
 # Editor directories and files
 .vscode/*
@@ -22,3 +53,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+.idea
+*.iml
+Thumbs.db
