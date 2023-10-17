@@ -1,6 +1,6 @@
-type Face = "up" | "down";
-type Suits = "Harts" | "Tiles" | "Clovers" | "Spades";
-type Ranks = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
+export type Face = "up" | "down";
+export type Suits = "Harts" | "Tiles" | "Clovers" | "Spades";
+export type Ranks = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
 export interface Card {
     suit: Suits;
     rank: Ranks;
@@ -12,30 +12,17 @@ export interface CompPile {
     pile: number,
 }
 
-const newRandom = (seed: number) => {
-    let x = 123456789;
-    let y = 362436069;
-    let z = 521288629;
-    let w = seed;
-
-    return () => {
-        let t = x ^ (x << 11);
-        x = y;
-        y = z;
-        z = w;
-        w = (w ^ (w >>> 19)) ^ (t ^ (t >>> 8));
-        return (Math.abs(w) % 65536)/65536;
-    }
-}
-
-const seed = 8;
-console.log(`seed: ${seed}`);
-const random = newRandom(seed);
-
+/**
+ * Generate cards deck
+ * @param n number of deck
+ * @param suits list of suits
+ * @param shuffle shuffle card list if set to true
+ * @returns Card[] card list
+ */
 export function newCards(
     {n = 1, suits = ["Harts", "Tiles", "Clovers", "Spades"], shuffle = true}:
     {n?: number, suits?: Suits[], shuffle?: boolean}
-) {
+): Card[] {
     let cards: Card[] = [];
     let ranks: Ranks[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
 
@@ -52,11 +39,34 @@ export function newCards(
     // shuffle cards
     if (shuffle) {
         for (let i = cards.length - 1; i >= 1; i--) {
+            // Debug with random
+            //const j = Math.floor(random() * (i+1));
             const j = Math.floor(Math.random() * (i+1));
             [cards[i], cards[j]] = [cards[j], cards[i]];
         }
     }
     return cards;
+}
+
+/**
+ * Check movability of the pile
+ * @param pile list of Card
+ * @returns The list is movable or not
+ */
+export const isMovable = (pile: Card[]): boolean => {
+    let previous = pile[0];
+    if (previous.face == "down") return false;
+
+    for (const card of pile.slice(1)) {
+        if (previous.suit != card.suit) {
+            return false;
+        }
+        if (previous.rank - 1 != card.rank) {
+            return false;
+        }
+        previous = card;
+    }
+    return true;
 }
 
 export interface Moving {
@@ -70,6 +80,10 @@ export interface TableauItem {
     moving: Moving,
 }
 
+/**
+ * Create a Tableau object
+ * @returns Tableau object
+ */
 export const newTableau = () => {
     let cards: Card[] = newCards({n: 4, suits: ['Harts', 'Spades'], shuffle: true});
     let piles: Card[][] = [];
@@ -94,22 +108,11 @@ export const newTableau = () => {
         }
     }
 
-    const isMovable = (pile: Card[]): boolean => {
-        let previous = pile[0];
-        if (previous.face == "down") return false;
-
-        for (const card of pile.slice(1)) {
-            if (previous.suit != card.suit) {
-                return false;
-            }
-            if (previous.rank - 1 != card.rank) {
-                return false;
-            }
-            previous = card;
-        }
-        return true;
-    }
-
+    /**
+     * Check if 13 cards in the pile is same suits and sequential
+     * @param pile13 list of Card
+     * @returns boolean it's true if the cards are same suits and sequential
+     */
     const completePile = (pile13: Card[]): boolean => {
         if (pile13.length != 13) return false;
 
@@ -124,15 +127,24 @@ export const newTableau = () => {
         return false;
     }
 
+    /**
+     * Initialize history
+     */
     const startHistory = () => {
         history = [];
     }
 
+    /**
+     * Append current tableau in history
+     */
     const pushHistory = () => {
         if (history == null) return;
         history.push(JSON.parse(JSON.stringify({piles: piles, cards: cards})));
     }
 
+    /**
+     * Retrieve a previous tableau from history 
+     */
     const popHistory = () => {
         if (history == null) return;
         cleanupMoving();
@@ -146,6 +158,12 @@ export const newTableau = () => {
         });
     };
 
+    /**
+     * Move the pile in 'moving' object
+     * @param pile pile number(column) in tableau
+     * @param row(card) in the pile
+     * @returns it's true if the pile is movable
+     */
     const pickupPile = (pile: number, row: number): boolean => {
         cleanupMoving();
         const src = piles[pile].slice(row);
@@ -158,6 +176,10 @@ export const newTableau = () => {
         return true;
     }
 
+    /**
+     * Clean up 'moving' object
+     * @returns 'moving' object before cleaning up
+     */
     const cleanupMoving = (): {pile: number, row: number} | null => {
         if (moving.cards.length == 0) return null;
         const row = piles[moving.source].length;
@@ -167,6 +189,11 @@ export const newTableau = () => {
         return {pile, row};
     }
     
+    /**
+     * Append 'moving' object to the destination pile using movePile()
+     * @param dst_pile destination pile
+     * @returns CompPile[] list of complete pile
+     */
     const putdownPile = (dst_pile: number | null): CompPile[] => {
         const src_pile = cleanupMoving();
         if (src_pile == null) return [];
@@ -177,12 +204,19 @@ export const newTableau = () => {
         return [];
     }
     
+    /**
+     * Move the src_pile to dst_pile and cleanup 'moving' object
+     * @param src_pile source pile
+     * @param dst_pile destination pile
+     * @returns complete piles
+     */
     const movePile = (src_pile: {pile: number, row: number}, dst_pile: number): CompPile[] => {
         cleanupMoving();
+        if (src_pile.pile == dst_pile) return [];
         const src = piles[src_pile.pile].slice(src_pile.row);
         if (src == undefined || src.length == 0) return [];
-        const dst_card = piles[dst_pile].slice(-1)[0];
         if (!isMovable(src)) return [];
+        const dst_card = piles[dst_pile].slice(-1)[0];
         if (dst_card == undefined || src[0].rank == dst_card.rank - 1) {
             pushHistory();
             const tmp_pile = piles[src_pile.pile].splice(src_pile.row);
@@ -201,7 +235,6 @@ export const newTableau = () => {
                 }
 
                 // record complete pile to return it
-                console.log(`complete pile: ${{card: comp_pile.slice(-1)[0], pile: dst_pile}}`);
                 return [{card: comp_pile.slice(-1)[0], pile: dst_pile}];
             }
         }
@@ -209,6 +242,10 @@ export const newTableau = () => {
         return [];
     }
 
+    /**
+     * Deal out a card from stock to each pile
+     * @returns complete piles
+     */
     const dealOut = (): CompPile[] => {
         cleanupMoving();
         if (cards.length == 0) return [];
@@ -235,11 +272,13 @@ export const newTableau = () => {
                 }
             }
         })
-        console.log(`dealOut: ${JSON.parse(JSON.stringify(complete_pile))}`);
-        console.log(complete_pile);
         return complete_pile;
     }
 
+    /**
+     * Check if tableau is clean
+     * @returns it's true if tableau has no cards
+     */
     const isTableauClean = (): boolean => {
         cleanupMoving();
         if (cards.length != 0) return false;
@@ -262,21 +301,3 @@ export const newTableau = () => {
         popHistory: popHistory,
     };
 }
-
-
-/*
-const SpiderTest = () => {
-    console.log("===== spider test =====");
-    const tableau = newTableau();
-    tableau.dealOut();
-    console.log('pile[0]');
-    console.log(tableau.piles[0]);
-    console.log('> pickup pile[0][5]');
-    tableau.pickupPile(0, 5)
-    console.log('pile[0]');
-    console.log(tableau.piles[0]);
-    console.log(tableau.moving);
-}
-
-SpiderTest();
-*/
