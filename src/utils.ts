@@ -54,3 +54,4 @@ export function flipedCard(piles: Card[][], previousPiles: Card[][]): Flip {
 
     return result;
 }
+
