@@ -184,7 +184,7 @@ function Tableau ({piles, onMovePile, showMessage, onRestart}: TableauProps) {
                 }
             })();
             const movingCard = document.createElement('img');
-            movingCard.src = '/cards/RED_BACK.svg';
+            movingCard.src = './cards/RED_BACK.svg';
             movingCard.style.position = "absolute";
             movingCard.style.left = srcLeft + "px";
             movingCard.style.top = srcTop + "px";

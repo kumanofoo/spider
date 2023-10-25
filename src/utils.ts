@@ -16,14 +16,14 @@ export const getCardImage = (c: Card): {front: string, back: string} => {
     
     if (c.face == "down") {
         return {
-            front: '/cards/RED_BACK.svg', 
-            back: `/cards/${rank_image[c.rank]}${suits_image[c.suit]}.svg`,
+            front: './cards/RED_BACK.svg',
+            back: `./cards/${rank_image[c.rank]}${suits_image[c.suit]}.svg`,
         };
     }
     else {
         return {
-            front: `/cards/${rank_image[c.rank]}${suits_image[c.suit]}.svg`,
-            back: '/cards/RED_BACK.svg',
+            front: `./cards/${rank_image[c.rank]}${suits_image[c.suit]}.svg`,
+            back: './cards/RED_BACK.svg',
         };
     }
 }
