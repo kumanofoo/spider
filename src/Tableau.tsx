@@ -295,3 +295,4 @@ function Tableau ({piles, onMovePile, showMessage, onRestart}: TableauProps) {
 
 
 export default Tableau;
+
