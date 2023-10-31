@@ -35,7 +35,7 @@ export type Flip = {
 }[];
 
 /**
- * find faced up card
+ * look for faced up card
  * @returns index of faced up card
  */
 export function flipedCard(piles: Card[][], previousPiles: Card[][]): Flip {

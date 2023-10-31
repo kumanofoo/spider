@@ -86,7 +86,7 @@ function Tableau ({piles, onMovePile, showMessage, onRestart}: TableauProps) {
             elements = document.elementsFromPoint(pagex, pagey);
         }
 
-        // find a pile under pointer
+        // look for a pile under pointer
         const piles = elements.map((element) => {
             if (!element.matches(".pile")) return null;
             const pile = (element as HTMLElement).dataset.pile;
@@ -231,18 +231,18 @@ function Tableau ({piles, onMovePile, showMessage, onRestart}: TableauProps) {
         }
         return (
             <div ref={elm} className={'pile-flip-card ' + props.from} style={style} key={props.row}>
-                <div className="pile-flip-card-front">
+                <div className="pile-flip-card-back">
                     <img
-                        src={props.cardImg.front}
+                        src={props.cardImg.back}
                         className="card flippable"
                         style={{marginTop: '0px'}}
                         data-col={props.col}
                         data-row={props.row}
                     />
                 </div>
-                <div className="pile-flip-card-back">
+                <div className="pile-flip-card-front">
                     <img
-                        src={props.cardImg.back}
+                        src={props.cardImg.front}
                         className="card flippable"
                         style={{marginTop: '0px'}}
                         data-col={props.col}
