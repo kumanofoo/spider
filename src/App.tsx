@@ -22,6 +22,9 @@ function Table () {
         tableau.popHistory();
         setStock(JSON.parse(JSON.stringify(tableau.cards)));
         setPiles({piles: JSON.parse(JSON.stringify(tableau.piles)), flip: []});
+        setFoundations(tableau.foundations.map((card) => {
+            return {card: card, pile: -1}}
+        ));
     }
 
     function onDealout() {
@@ -32,7 +35,9 @@ function Table () {
         })
         setStock(JSON.parse(JSON.stringify(tableau.cards)));
         setPiles({piles: JSON.parse(JSON.stringify(tableau.piles)), flip: flip});
-        setFoundations(f => [...f, ...completePiles]);
+        if (completePiles.length > 0) {
+            setFoundations(f => [...f, ...completePiles]);
+        }
     }
     
     function onMovePile(src: {pile: number, row: number}, dest: number) {
@@ -40,7 +45,9 @@ function Table () {
         const flip = flipedCard(tableau.piles, previousPiles);
         previousPiles = JSON.parse(JSON.stringify(tableau.piles));
         setPiles({piles: JSON.parse(JSON.stringify(tableau.piles)), flip: flip});
-        setFoundations(f => [...f, ...completePiles]);
+        if (completePiles.length > 0) {
+            setFoundations(f => [...f, ...completePiles]);
+        }
     }
 
     function win() {

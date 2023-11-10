@@ -77,6 +77,7 @@ export interface Moving {
 export interface TableauItem {
     cards: Card[],
     piles: Card[][],
+    foundations: Card[],
     moving: Moving,
 }
 
@@ -85,8 +86,9 @@ export interface TableauItem {
  * @returns Tableau object
  */
 export const newTableau = () => {
-    let cards: Card[] = newCards({n: 4, suits: ['Harts', 'Spades'], shuffle: true});
+    let cards: Card[] = newCards({n: 4, suits: ['Harts', 'Spades'], shuffle: false});
     let piles: Card[][] = [];
+    let foundations: Card[] = [];
     let moving: Moving = {cards: [], source: 0};
     let history: TableauItem[] | null = null;
     for (let i = 0; i < 4; i++) {
@@ -139,7 +141,7 @@ export const newTableau = () => {
      */
     const pushHistory = () => {
         if (history == null) return;
-        history.push(JSON.parse(JSON.stringify({piles: piles, cards: cards})));
+        history.push(JSON.parse(JSON.stringify({piles: piles, cards: cards, foundations: foundations})));
     }
 
     /**
@@ -156,6 +158,8 @@ export const newTableau = () => {
             pile.splice(0);
             if (h != undefined) pile.push(...h.piles[index]);
         });
+        foundations.splice(0);
+        foundations.push(...h.foundations);
     };
 
     /**
@@ -235,6 +239,7 @@ export const newTableau = () => {
                 }
 
                 // record complete pile to return it
+                foundations.push(structuredClone(comp_pile.slice(-1)[0]));
                 return [{card: comp_pile.slice(-1)[0], pile: dst_pile}];
             }
         }
@@ -268,6 +273,7 @@ export const newTableau = () => {
                     }
 
                     // record complete pile to return it
+                    foundations.push(structuredClone(comp_pile.slice(-1)[0]));
                     complete_pile.push({card: comp_pile.slice(-1)[0], pile: i});
                 }
             }
@@ -292,6 +298,7 @@ export const newTableau = () => {
         cards: cards,
         piles: piles,
         moving: moving,
+        foundations: foundations,
         pickupPile: pickupPile,
         putdownPile: putdownPile,
         movePile: movePile,

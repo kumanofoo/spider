@@ -13,6 +13,7 @@ function Foundations({cards, win}: FoundationsProps) {
         if (foundations == null) return;
 
         cards.forEach((card) => {
+            // card.pile == -1 if the card is processed. 
             if (card.pile < 0) return;
 
             // get destination
@@ -30,7 +31,7 @@ function Foundations({cards, win}: FoundationsProps) {
             })();
             if (destPile == null) return;
 
-            // get start position
+            // get start position and put a moving foundation there
             const pileElement = document.getElementsByClassName('pile')[card.pile];
             const bottomCard = pileElement.children[pileElement.children.length - 1] as HTMLElement;
             const movingFoundation = document.createElement('div');
@@ -79,21 +80,25 @@ function Foundations({cards, win}: FoundationsProps) {
             };
 
             card.pile = -1;
-        }, [cards]);
-    });
+        });
+    }, [cards]);
 
     const foundations = cards.map((card, i) => {
+        let opacity = 0;
+        if (card.pile < 0) {
+            opacity = 1;
+        }
         const card_img = getCardImage(card.card).front;
         if (i == 0) {
             return (
-                <div data-from={card.pile} style={{marginLeft: "0", opacity: "0"}} key={i}>
+                <div data-from={card.pile} style={{marginLeft: "0", opacity: opacity}} key={i}>
                     <img src={card_img} className="card" />
                 </div>
             );
         }
         else {
             return (
-                <div data-from={card.pile} style={{marginLeft: "-5vw", opacity: "0"}} key={i} >
+                <div data-from={card.pile} style={{marginLeft: "-5vw", opacity: opacity}} key={i} >
                     <img src={card_img} className="card"  />
                 </div>
             );
