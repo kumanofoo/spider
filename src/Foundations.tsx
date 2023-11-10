@@ -13,7 +13,7 @@ function Foundations({cards, win}: FoundationsProps) {
         if (foundations == null) return;
 
         cards.forEach((card) => {
-            // card.pile == -1 if the card is processed. 
+            // card.pile == -1 if the card is processed
             if (card.pile < 0) return;
 
             // get destination

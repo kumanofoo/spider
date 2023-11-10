@@ -86,7 +86,7 @@ export interface TableauItem {
  * @returns Tableau object
  */
 export const newTableau = () => {
-    let cards: Card[] = newCards({n: 4, suits: ['Harts', 'Spades'], shuffle: false});
+    let cards: Card[] = newCards({n: 4, suits: ['Harts', 'Spades'], shuffle: true});
     let piles: Card[][] = [];
     let foundations: Card[] = [];
     let moving: Moving = {cards: [], source: 0};
