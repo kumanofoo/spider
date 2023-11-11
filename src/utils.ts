@@ -55,3 +55,21 @@ export function flipedCard(piles: Card[][], previousPiles: Card[][]): Flip {
     return result;
 }
 
+/**
+ * preload images of cards
+ * @param cards list of card
+ * @param side side of cards: front, back, or both 
+ */
+export function preloadImage(cards: Card[], side: "front" | "back" | "both") {
+    cards.forEach((card) => {
+        const cardImage = getCardImage(card);
+        if (side == "front" || side == "both") {
+            const img = document.createElement("img");
+            img.src = cardImage.front;
+        }
+        if (side == "back" || side == "both") {
+            const img = document.createElement("img");
+            img.src = cardImage.back;
+        }
+    });
+}
