@@ -5,9 +5,10 @@ import Tableau from "./Tableau";
 import Foundations from "./Foundations";
 import MovingPile from "./MovingPile";
 import Stock from "./Stock";
-import { flipedCard, Flip } from "./utils";
+import { flipedCard, Flip, preloadImage } from "./utils";
 
 let tableau = newTableau();
+preloadImage(tableau.cards, "both");
 tableau.dealOut();
 tableau.startHistory();
 let previousPiles: Card[][] = JSON.parse(JSON.stringify(tableau.piles));
