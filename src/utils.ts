@@ -60,16 +60,31 @@ export function flipedCard(piles: Card[][], previousPiles: Card[][]): Flip {
  * @param cards list of card
  * @param side side of cards: front, back, or both 
  */
-export function preloadImage(cards: Card[], side: "front" | "back" | "both") {
-    cards.forEach((card) => {
+export async function preloadImages(cards: Card[], side: "front" | "back" | "both") {
+    const loadingImages2d = cards.map((card) => {
+        const res: Promise<HTMLImageElement>[] = [];
         const cardImage = getCardImage(card);
         if (side == "front" || side == "both") {
-            const img = document.createElement("img");
-            img.src = cardImage.front;
+            res.push(new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = (e) => reject(e);
+                img.src = cardImage.front;    
+            }));
         }
         if (side == "back" || side == "both") {
-            const img = document.createElement("img");
-            img.src = cardImage.back;
+            res.push(new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = (e) => reject(e);
+                img.src = cardImage.back;    
+            }));
         }
+        return res;
     });
+    const promises: Promise<HTMLImageElement>[] = [];
+    loadingImages2d.forEach((loadingImages) => {
+        loadingImages.forEach((promise) => promises.push(promise));
+    });
+    await Promise.all(promises);
 }

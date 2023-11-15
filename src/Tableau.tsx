@@ -7,11 +7,9 @@ import { getCardImage, Flip } from "./utils";
 type TableauProps = {
     piles: {piles: Card[][], flip: Flip},
     onMovePile: (srcPile: {pile: number, row: number}, dstPile: number) => void,
-    showMessage: boolean,
-    onRestart: () => void,
 }
 
-function Tableau ({piles, onMovePile, showMessage, onRestart}: TableauProps) {
+function Tableau ({piles, onMovePile}: TableauProps) {
     const onSelect = (event: Event) => {
         event.preventDefault();
         const card = event.target as HTMLElement;
@@ -285,11 +283,6 @@ function Tableau ({piles, onMovePile, showMessage, onRestart}: TableauProps) {
     return (
         <div className="tableau">
             {html_piles}
-            {showMessage && 
-                <div className="message" onClick={() => onRestart()}>
-                    <div className="text">YOU WON!</div>
-                </div>
-            }
         </div>);
 }
 

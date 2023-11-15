@@ -254,6 +254,12 @@ export const newTableau = () => {
     const dealOut = (): CompPile[] => {
         cleanupMoving();
         if (cards.length == 0) return [];
+        // if empty pile is found, do nothing
+        for (let i = 0; i < piles.length; i++) {
+            if (piles[i].length == 0) {
+                return [];
+            };
+        }
         pushHistory();
 
         const complete_pile: CompPile[] = [];
