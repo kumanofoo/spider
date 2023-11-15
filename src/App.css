@@ -91,7 +91,7 @@ svg {
     flex-flow: row;
 }
 
-.tableau .message {
+.table .message {
   position: absolute;
   left: 0;
   top: 0;

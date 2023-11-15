@@ -1,23 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CompPile, newTableau } from "./spider";
 import "./App.css";
 import Tableau from "./Tableau";
 import Foundations from "./Foundations";
 import MovingPile from "./MovingPile";
 import Stock from "./Stock";
-import { flipedCard, Flip, preloadImage } from "./utils";
+import { flipedCard, Flip, preloadImages } from "./utils";
+
+// prevent text selection by pointer
+document.onselectstart = () => { return false; };
 
 let tableau = newTableau();
-preloadImage(tableau.cards, "both");
 tableau.dealOut();
 tableau.startHistory();
 let previousPiles: Card[][] = JSON.parse(JSON.stringify(tableau.piles));
 
 function Table () {
-    const [piles, setPiles] = useState<{piles: Card[][], flip: Flip}>({piles: tableau.piles, flip: []});
-    const [stock, setStock] = useState(tableau.cards);
+    const [piles, setPiles] = useState<{piles: Card[][], flip: Flip}>({piles: [], flip: []});
+    const [stock, setStock] = useState<Card[]>([]);
     const [foundations, setFoundations] = useState<CompPile[]>([]);
-    const [youWon, setYouWon] = useState(false);
+    const [showMessage, setShowMessage] = useState({message: "♠♥♣♦", on: () => {}});
+
+    useEffect(() => {
+        preloadImages(tableau.cards, "both").then(() => {
+            // done preloading images
+            setPiles({piles: tableau.piles, flip: []});
+            setStock(tableau.cards);
+            setShowMessage({message: "", on: () => {}});
+        })
+    }, []);
 
     function onUndo() {
         tableau.popHistory();
@@ -29,7 +40,11 @@ function Table () {
     }
 
     function onDealout() {
+        const previous = tableau.cards.length;
         const completePiles = tableau.dealOut();
+        // when dealout was not done, do nothing  
+        if (previous == tableau.cards.length) return;
+
         // all dealouted cards are flippable
         const flip = tableau.piles.map((pile, i) => {
             return {pile: i, row: pile.length - 1, from: "stock"};
@@ -53,7 +68,7 @@ function Table () {
 
     function win() {
         if (tableau.isTableauClean()) {
-            setYouWon(true);
+            setShowMessage({message: "YOU WON!", on: onRestart});
         }
     }
 
@@ -61,7 +76,7 @@ function Table () {
         tableau = newTableau();
         tableau.dealOut();
         tableau.startHistory();
-        setYouWon(false);            
+        setShowMessage({message: "", on: () => {}});            
         setPiles({piles: tableau.piles, flip: []});
         setStock(tableau.cards);
         setFoundations([]);
@@ -77,10 +92,13 @@ function Table () {
             <Tableau 
                 piles={piles} 
                 onMovePile={onMovePile}
-                showMessage={youWon}
-                onRestart={onRestart}
             />
             <MovingPile />
+            {showMessage.message != "" &&
+                <div className="message" onClick={showMessage.on}>
+                    <div className="text">{showMessage.message}</div>
+                </div>
+            }
         </div>
     );
 }
