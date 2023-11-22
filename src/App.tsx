@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, MouseEvent } from "react";
 import { Card, CompPile, newTableau } from "./spider";
 import "./App.css";
 import Tableau from "./Tableau";
@@ -15,11 +15,18 @@ tableau.dealOut();
 tableau.startHistory();
 let previousPiles: Card[][] = JSON.parse(JSON.stringify(tableau.piles));
 
+interface ShowDialog {
+    text: string,
+    ok: (e: MouseEvent) => void,
+    cancel: (e: MouseEvent) => void,
+}
+
 function Table () {
     const [piles, setPiles] = useState<{piles: Card[][], flip: Flip}>({piles: [], flip: []});
     const [stock, setStock] = useState<Card[]>([]);
     const [foundations, setFoundations] = useState<CompPile[]>([]);
     const [showMessage, setShowMessage] = useState({message: "♠♥♣♦", on: () => {}});
+    const [showDialog, setShowDialog] = useState<ShowDialog>({text: "", ok: () => {}, cancel: () => {}});
 
     useEffect(() => {
         preloadImages(tableau.cards, "both").then(() => {
@@ -33,6 +40,7 @@ function Table () {
     function onUndo() {
         tableau.popHistory();
         setStock(JSON.parse(JSON.stringify(tableau.cards)));
+        previousPiles = JSON.parse(JSON.stringify(tableau.piles));
         setPiles({piles: JSON.parse(JSON.stringify(tableau.piles)), flip: []});
         setFoundations(tableau.foundations.map((card) => {
             return {card: card, pile: -1}}
@@ -76,15 +84,44 @@ function Table () {
         tableau = newTableau();
         tableau.dealOut();
         tableau.startHistory();
-        setShowMessage({message: "", on: () => {}});            
+        setShowMessage({message: "", on: () => {}});
         setPiles({piles: tableau.piles, flip: []});
         setStock(tableau.cards);
         setFoundations([]);
     }
+
+    function onNew() {
+        const ok = (event: MouseEvent) => {
+            event.preventDefault();
+            event.stopPropagation();
+            tableau = newTableau();
+            tableau.dealOut();
+            tableau.startHistory();
+            setPiles({piles: tableau.piles, flip: []});
+            setStock(tableau.cards);
+            setFoundations([]);
+            setShowDialog({text: "", ok: () => {}, cancel: () => {}});
+        }
+        const cancel = (event: MouseEvent) => {
+            event.preventDefault();
+            event.stopPropagation();
+            setShowDialog({text: "", ok: () => {}, cancel: () => {}});
+        }
+        // clean up flip animations
+        setPiles({piles: tableau.piles, flip: []});
+        setShowDialog({
+            text: "Click here to new Game",
+            ok: ok,
+            cancel: cancel,
+        });
+    }
     
     return (
         <div className="table">
-            <Button onUndo={onUndo} />
+            <div id="buttons">
+                <ButtonNew  onNew={onNew} />
+                <ButtonUndo onUndo={onUndo} />
+            </div>
             <div id="firstRow">
                 <Stock cards={stock} onDealout={onDealout} />
                 <Foundations cards={foundations} win={win}/>
@@ -99,16 +136,29 @@ function Table () {
                     <div className="text">{showMessage.message}</div>
                 </div>
             }
+            {showDialog.text != "" &&
+                <div className="dialog" onClick={showDialog.cancel}>
+                    <div className="dialog-text" onClick={showDialog.ok}>{showDialog.text}</div>
+                </div>
+            }
         </div>
     );
 }
 
-type ButtonProps = {
+type ButtonUndoProps = {
     onUndo: () => void,
 }
 
-function Button({onUndo}: ButtonProps) {
-    return <button onClick={()=>onUndo()}>Undo</button>
+function ButtonUndo({onUndo}: ButtonUndoProps) {
+    return <button className="button-undo" onClick={()=>onUndo()}>Undo</button>
+}
+
+type ButtonNewProps = {
+    onNew: () => void,
+}
+
+function ButtonNew({onNew}: ButtonNewProps) {
+    return <button className="button-new" onClick={()=>onNew()}>New</button>
 }
 
 function App() {
