@@ -56,6 +56,17 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+.button-new {
+  display: inline-block;
+}
+.button-undo {
+  display: inline-block;
+}
+#buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1vh;
+}
 
 @media (prefers-color-scheme: light) {
   :root {

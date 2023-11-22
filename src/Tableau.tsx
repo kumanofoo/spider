@@ -136,6 +136,7 @@ function Tableau ({piles, onMovePile}: TableauProps) {
     const Card = (props: CardProps) => {
         let top = {};
         if (props.row == 0) {
+            //top = {marginTop: 'calc(-9vw * 312 / 224)'};
             top = {marginTop: '0'};
         }
         return (
@@ -197,7 +198,7 @@ function Tableau ({piles, onMovePile}: TableauProps) {
                 },
             ], {
                 duration: 200,
-
+                delay: 100*props.col,
             });
             anime.addEventListener("finish", () => {
                 if (elm.current != null) {
@@ -273,11 +274,10 @@ function Tableau ({piles, onMovePile}: TableauProps) {
                     </div>);
             })()];
         }
-        return (<div
-                className="pile"
-                key={col}
-                data-pile={col}
-                >{cards}</div>);
+        return (
+            <div className="pile" key={col} data-pile={col}>
+                {cards}
+            </div>);
     });
 
     return (
