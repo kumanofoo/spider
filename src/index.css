@@ -25,11 +25,16 @@ a:hover {
 }
 
 body {
+  background-image: url('/wall.jpg');
+  background-repeat: repeat;
+
   margin: 0;
   display: flex;
   place-items: center;
   min-width: 320px;
-  min-height: 100vh;
+  min-height: 98vh;
+  padding: 1vh 1vw;
+  background-color: #064D25;
 }
 
 h1 {
@@ -61,11 +66,6 @@ button:focus-visible {
 }
 .button-undo {
   display: inline-block;
-}
-#buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 1vh;
 }
 
 @media (prefers-color-scheme: light) {

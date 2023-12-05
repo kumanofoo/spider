@@ -29,9 +29,9 @@ function Tableau ({piles, onMovePile}: TableauProps) {
         if (!isMovable(src)) return;
 
         // hide selected cards
-        const cards = pileCard.parentElement?.children;
+        const cards = pileCard.parentElement?.children;  // cards[0] is no-card
         if (cards == null) return;
-        for (let i = row; i < cards.length; i++) {
+        for (let i = row+1; i < cards.length; i++) {  // row 0 card is in cards[1]
             (cards[i] as HTMLElement).style.visibility = "hidden";
         }
 
@@ -128,6 +128,7 @@ function Tableau ({piles, onMovePile}: TableauProps) {
         }
     }, [piles]);
 
+    let cardMarginTop = 'calc(-9vw * 312 / 224)';
     type CardProps = {
         cardImg: {front: string, back: string},
         col: number,
@@ -136,8 +137,7 @@ function Tableau ({piles, onMovePile}: TableauProps) {
     const Card = (props: CardProps) => {
         let top = {};
         if (props.row == 0) {
-            //top = {marginTop: 'calc(-9vw * 312 / 224)'};
-            top = {marginTop: '0'};
+            top = {marginTop: cardMarginTop};
         }
         return (
             <div className="pile-card" style={top} key={props.row}>
@@ -197,7 +197,7 @@ function Tableau ({piles, onMovePile}: TableauProps) {
                     top: dstTop + "px",
                 },
             ], {
-                duration: 200,
+                duration: 100+10*props.col,
                 delay: 100*props.col,
             });
             anime.addEventListener("finish", () => {
@@ -220,7 +220,7 @@ function Tableau ({piles, onMovePile}: TableauProps) {
         }
         let style: Style = {};
         if (props.row == 0) {
-            style.marginTop = '0';
+            style.marginTop = cardMarginTop;
         }
         if (props.from == 'stock') {
             style.visibility = 'hidden';
@@ -262,20 +262,13 @@ function Tableau ({piles, onMovePile}: TableauProps) {
             }
             return <Card cardImg={card_img} col={col} row={row} />
         });
-        if (cards.length == 0) {
-            cards = [(() => {
-                return (
-                    <div className="no-card" key="empty">
-                        <svg>
-                            <rect
-                                className="emptycard" x="0" y="0"
-                            />
-                        </svg>
-                    </div>);
-            })()];
-        }
         return (
             <div className="pile" key={col} data-pile={col}>
+                <div className="no-card" key="empty">
+                    <svg>
+                        <rect className="emptycard" x="0" y="0"/>
+                    </svg>
+                </div>
                 {cards}
             </div>);
     });
