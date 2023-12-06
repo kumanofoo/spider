@@ -83,8 +83,21 @@ export const newMovingPile = () => {
     const move = (pageX: number, pageY: number) => {
         if (!movingPile) return;
         if (movingPile?.innerHTML == '') return;
-        movingPile.style.left = (pageX - diff.x) + "px";
-        movingPile.style.top = (pageY - diff.y) + "px";
+
+        let left = pageX - diff.x;
+        let top = pageY - diff.y
+
+        // check boundary
+        const parent = movingPile?.offsetParent?.getBoundingClientRect();
+        if (!parent) return;
+        left = Math.max(left, 0);
+        left = Math.min(left, parent.width - movingPile.offsetWidth);
+        top = Math.max(top, 0);
+        top = Math.min(top, parent.height - movingPile.offsetHeight);
+
+        // move pile
+        movingPile.style.left = left + "px";
+        movingPile.style.top = top + "px";
     }
 
     /**

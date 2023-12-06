@@ -1,6 +1,7 @@
 # spider
 Spider Solitaire
 
-## Demo
-https://kumanofoo.github.io/spider
+<img src="spider.png" width="512px">
+
+Demo: https://kumanofoo.github.io/spider
 
