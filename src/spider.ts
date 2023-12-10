@@ -81,12 +81,21 @@ export interface TableauItem {
     moving: Moving,
 }
 
+export type SpiderMode = {
+    n: number,
+    suits: Suits[],
+}
+export const SPIDER_MODE_EASY: SpiderMode = {n: 8, suits: ['Spades']};
+export const SPIDER_MODE_MEDIUM: SpiderMode =  {n: 4, suits: ['Harts', 'Spades']};
+export const SPIDER_MODE_HARD: SpiderMode =  {n: 2, suits: ['Harts', 'Spades', 'Tiles', 'Clovers']};
+
 /**
  * Create a Tableau object
+ * @param mode SPIDER_MODE_EASY | SPIDER_MODE_MEDIUM | SPIDER_MODE_HARD
  * @returns Tableau object
  */
-export const newTableau = () => {
-    let cards: Card[] = newCards({n: 4, suits: ['Harts', 'Spades'], shuffle: true});
+export const newTableau = (mode: SpiderMode) => {
+    let cards: Card[] = newCards({...mode, shuffle: true});
     let piles: Card[][] = [];
     let foundations: Card[] = [];
     let moving: Moving = {cards: [], source: 0};

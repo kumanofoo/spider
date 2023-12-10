@@ -1,5 +1,5 @@
 import { useState, useEffect, MouseEvent } from "react";
-import { Card, CompPile, newTableau } from "./spider";
+import { Card, CompPile, SPIDER_MODE_EASY, SPIDER_MODE_HARD, SPIDER_MODE_MEDIUM, SpiderMode, newTableau } from "./spider";
 import "./App.css";
 import Tableau from "./Tableau";
 import Foundations from "./Foundations";
@@ -10,15 +10,16 @@ import { flipedCard, Flip, preloadImages } from "./utils";
 // prevent text selection by pointer
 document.onselectstart = () => { return false; };
 
-let tableau = newTableau();
+let spiderMode: SpiderMode = SPIDER_MODE_MEDIUM;
+let tableau = newTableau(spiderMode);
 tableau.dealOut();
 tableau.startHistory();
 let previousPiles: Card[][] = JSON.parse(JSON.stringify(tableau.piles));
 
-interface ShowDialog {
-    text: string,
-    ok: (e: MouseEvent) => void,
+interface ShowNewDialog {
+    show: boolean,
     cancel: (e: MouseEvent) => void,
+    ok: (e: MouseEvent) => void,
 }
 
 function Table () {
@@ -26,7 +27,7 @@ function Table () {
     const [stock, setStock] = useState<Card[]>([]);
     const [foundations, setFoundations] = useState<CompPile[]>([]);
     const [showMessage, setShowMessage] = useState({message: "♠♥♣♦", on: () => {}});
-    const [showDialog, setShowDialog] = useState<ShowDialog>({text: "", ok: () => {}, cancel: () => {}});
+    const [showNewDialog, setShowNewDialog] = useState<ShowNewDialog>({show: false, ok: () => {}, cancel: () => {}});
 
     useEffect(() => {
         preloadImages(tableau.cards, "both").then(() => {
@@ -81,7 +82,7 @@ function Table () {
     }
 
     function onRestart() {
-        tableau = newTableau();
+        tableau = newTableau(spiderMode);
         tableau.dealOut();
         tableau.startHistory();
         setShowMessage({message: "", on: () => {}});
@@ -94,23 +95,23 @@ function Table () {
         const ok = (event: MouseEvent) => {
             event.preventDefault();
             event.stopPropagation();
-            tableau = newTableau();
+            tableau = newTableau(spiderMode);
             tableau.dealOut();
             tableau.startHistory();
             setPiles({piles: tableau.piles, flip: []});
             setStock(tableau.cards);
             setFoundations([]);
-            setShowDialog({text: "", ok: () => {}, cancel: () => {}});
+            setShowNewDialog({show: false, ok: () => {}, cancel: () => {}});
         }
         const cancel = (event: MouseEvent) => {
             event.preventDefault();
             event.stopPropagation();
-            setShowDialog({text: "", ok: () => {}, cancel: () => {}});
+            setShowNewDialog({show: false, ok: () => {}, cancel: () => {}});
         }
         // clean up flip animations
         setPiles({piles: tableau.piles, flip: []});
-        setShowDialog({
-            text: "Click here to new Game",
+        setShowNewDialog({
+            show: true,
             ok: ok,
             cancel: cancel,
         });
@@ -136,9 +137,16 @@ function Table () {
                     <div className="text">{showMessage.message}</div>
                 </div>
             }
-            {showDialog.text != "" &&
-                <div className="dialog" onClick={showDialog.cancel}>
-                    <div className="dialog-text" onClick={showDialog.ok}>{showDialog.text}</div>
+            {showNewDialog.show &&
+                <div className="dialog" onClick={showNewDialog.cancel}>
+                    <div className="new-dialog-content" >
+                        <div>Select Game Mode</div>
+                        <div id="mode">
+                            <div className="mode-button" onClick={(e) => {spiderMode = SPIDER_MODE_EASY; showNewDialog.ok(e);}}>EASY</div>
+                            <div className="mode-button" onClick={(e) => {spiderMode = SPIDER_MODE_MEDIUM; showNewDialog.ok(e);}}>MEDIUM</div>
+                            <div className="mode-button" onClick={(e) => {spiderMode = SPIDER_MODE_HARD; showNewDialog.ok(e);}}>HARD</div>
+                        </div>
+                    </div>
                 </div>
             }
         </div>

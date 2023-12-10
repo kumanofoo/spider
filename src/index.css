@@ -13,6 +13,7 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
   backface-visibility: hidden;
+  overscroll-behavior: none;
 }
 
 a {
