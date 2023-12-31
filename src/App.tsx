@@ -106,6 +106,8 @@ function Table () {
         const cancel = (event: MouseEvent) => {
             event.preventDefault();
             event.stopPropagation();
+            // update event listener
+            setPiles({piles: JSON.parse(JSON.stringify(tableau.piles)), flip: []});
             setShowNewDialog({show: false, ok: () => {}, cancel: () => {}});
         }
         // clean up flip animations
