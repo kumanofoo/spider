@@ -32,9 +32,7 @@ suits.forEach(s => {
     svgs.push(`${cardsPath}/${r}${s}.svg`);
   })
 });
-console.log(svgs);
 urlsToCache.push(...svgs);
-console.log(urlsToCache);
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
